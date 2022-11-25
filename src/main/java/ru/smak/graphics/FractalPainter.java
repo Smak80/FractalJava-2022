@@ -8,6 +8,9 @@ import ru.smak.math.fractals.Fractal;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class FractalPainter implements Painter {
 
@@ -55,14 +58,14 @@ public class FractalPainter implements Painter {
         this.g = g;
         var bt = System.currentTimeMillis();
         var threadCount = Runtime.getRuntime().availableProcessors();
-        var bWidth = getWidth() / threadCount + 1;
-        ArrayList<Thread> threads = new ArrayList<>();
-        for (int threadNum = 0; threadNum < threadCount; threadNum++) {
-            int finalThreadNum = threadNum;
-            threads.add(new Thread(() -> {
+        var pool = Executors.newFixedThreadPool(threadCount);
+        var bWidth = getWidth() / threadCount / 20 + 1;
+        var taskCount = getWidth() / bWidth + ((getWidth() % bWidth != 0) ? 1 : 0);
+        for (int k = 0; k < taskCount; k++) {
+            int shift = k * bWidth;
+            pool.submit(() -> {
                 var img = new BufferedImage(bWidth, getHeight(), BufferedImage.TYPE_INT_RGB);
                 var tGr = img.createGraphics();
-                var shift = finalThreadNum * bWidth;
                 for (int i = shift; i < shift + bWidth; i++) {
                     for (int j = 0; j < getHeight(); j++) {
                         var x = Converter.INSTANCE.xScrToCrt(i, plane);
@@ -70,18 +73,17 @@ public class FractalPainter implements Painter {
                         var r = f.isInSet(new Complex(x, y));
                         var c = colorFunc.getColor(r);
                         tGr.setColor(c);
-                        tGr.drawLine(i - shift, j, i - shift + 1, j + 1);
+                        tGr.drawLine(i - shift, j, i + 1 - shift, j + 1);
                     }
                 }
                 g.drawImage(img, shift, 0, null);
-            }));
-            threads.get(threads.size() - 1).start();
+            });
         }
-        for (var t : threads){
-            try {
-                t.join();
-            } catch (InterruptedException ignored) {
-            }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(60, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         var et = System.currentTimeMillis();
         System.out.println(et - bt);
