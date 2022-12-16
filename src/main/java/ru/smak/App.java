@@ -8,5 +8,6 @@ public class App
     {
         var wnd = new MainWindow();
         wnd.setVisible(true);
+
     }
 }

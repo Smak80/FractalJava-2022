@@ -1,0 +1,17 @@
+{
+  "MandelbrotXi": 0,
+  "CurrentColorI": 0,
+  "ColorSave": {},
+  "PlaneSave": {
+    "_xMin": -2.0,
+    "_xMax": 1.0,
+    "_yMin": -1.0,
+    "_yMax": 1.0,
+    "_width": 577,
+    "_height": 395
+  },
+  "MandelbrotSave": {
+    "maxIterations": 200,
+    "r": 2.0
+  }
+}

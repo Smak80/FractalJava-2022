@@ -1,9 +1,11 @@
 package ru.smak.graphics;
 
 import org.jetbrains.annotations.NotNull;
+import ru.smak.gui.MainWindow;
 import ru.smak.gui.Painter;
 import ru.smak.math.Complex;
 import ru.smak.math.fractals.Fractal;
+import ru.smak.movie.MovieWindow;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -15,6 +17,10 @@ public class FractalPainter implements Painter {
     private Fractal f;
     private Graphics g;
 
+    public Plane getPlane() {
+        return plane;
+    }
+
     private Colorizer colorFunc;
 
     public FractalPainter(Plane plane, Fractal f, Colorizer colorFunc) {
@@ -23,9 +29,16 @@ public class FractalPainter implements Painter {
         this.colorFunc = colorFunc;
     }
 
+    public FractalPainter(FractalPainter other) {
+        this.plane = new Plane(other.getPlane());
+        this.f = other.getFractal();
+        this.colorFunc = other.getColorFunc();
+    }
+
     public Colorizer getColorFunc() {
         return colorFunc;
     }
+    public Fractal getFractal(){return f;}
     public void setColorFunc(Colorizer colorFunc) {
         this.colorFunc = colorFunc;
     }
@@ -53,7 +66,7 @@ public class FractalPainter implements Painter {
     @Override
     public void paint(@NotNull Graphics g) {
         this.g = g;
-        var bt = System.currentTimeMillis();
+        //var bt = System.currentTimeMillis();
         var threadCount = Runtime.getRuntime().availableProcessors();
         var bWidth = getWidth() / threadCount + 1;
         ArrayList<Thread> threads = new ArrayList<>();
@@ -83,7 +96,13 @@ public class FractalPainter implements Painter {
             } catch (InterruptedException ignored) {
             }
         }
-        var et = System.currentTimeMillis();
-        System.out.println(et - bt);
+        //var et = System.currentTimeMillis();
+        //System.out.println(et - bt);
+    }
+
+    public BufferedImage getBufferedImage(){
+        var img = new BufferedImage(plane.getWidth(), plane.getHeight(), BufferedImage.TYPE_INT_RGB);
+        this.paint(img.createGraphics());
+        return img;
     }
 }

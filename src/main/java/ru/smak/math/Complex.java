@@ -53,4 +53,39 @@ public class Complex{
     public double abs2(){
         return re * re + im * im;
     }
+    public Complex eInPower(Complex z){
+        double x = z.re;
+        double y = z.im;
+        return new Complex(Math.exp(x)*Math.cos(y), Math.exp(x)*Math.sin(y));
+    }
+    public Complex cos(Complex z){
+        Complex i = new Complex(0,1);
+        return new Complex((eInPower(z.times(i)).plus(eInPower(z.times(i.times(new Complex(-1,0)))))).times(new Complex(0.5,0)));
+    }
+    public Complex sin(Complex z){
+        Complex i = new Complex(0,1);
+        return new Complex((eInPower(z.times(i)).minus(eInPower(z.times(i.times(new Complex(-1,0)))))).times(new Complex(0, -0.5)));
+    }
+    public Complex ch(Complex z){
+        return new Complex((eInPower(z).plus(eInPower(z.times(new Complex(-1,0))))).times(new Complex(0.5,0)));
+    }
+    public Complex sh(Complex z){
+        return new Complex((eInPower(z).minus(eInPower(z.times(new Complex(-1,0))))).times(new Complex(0.5,0)));
+    }
+
+    /**
+     *
+     * @return аргумент комплексного числа
+     */
+    public float arg()
+    {
+        //return (float)Math.atan(this.getIm()/this.getRe());
+        return (float)Math.acos((this.getRe())/(this.abs()));
+    }
+    public float arg2()
+    {
+        //return (float)Math.atan(this.getIm()/this.getRe());
+        return (float)Math.asin((this.getRe())/(this.abs()));
+    }
 }
+
